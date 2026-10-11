@@ -1,0 +1,4 @@
+name: artinchip-tools
+build:
+  cmake: .
+  sysbuild-cmake: sysbuild
