@@ -1,0 +1,55 @@
+# Build artifacts
+/build/
+
+# Vendored SDK/toolchain trees (not part of the Zephyr module)
+/cmake/
+/env/
+/toolchain/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+
+# Editor and OS
+*~
+*.swp
+*.swo
+.DS_Store
+.idea/
+.vscode/
+
+# Ignore everything under scripts/ except the packaging module files
+/scripts/*
+!/scripts/mk_image.py
+!/scripts/pack_resources.py
+!/scripts/mk_image_zephyr.py
+!/scripts/airburn.py
+!/scripts/mk_image_mcuboot.py
+!/scripts/zephyr_image_metadata.py
+!/scripts/gen_partition_table.py
+!/scripts/mk_private_resource.py
+!/scripts/mk_prebootprog.py    
+!/scripts/mkimage
+!/scripts/mkenvimage
+!/scripts/upgcmd
+!/scripts/Cryptodome/
+!/scripts/Cryptodome/**
+!/scripts/gmssl/
+!/scripts/gmssl/**
+!/scripts/asn1crypto/
+!/scripts/asn1crypto/**
+!/scripts/pack/
+!/scripts/pack/**
+
+# Exclude caches and Windows binaries even under whitelisted script paths
+scripts/**/__pycache__/
+scripts/**/*.py[cod]
+scripts/**/*.pyd

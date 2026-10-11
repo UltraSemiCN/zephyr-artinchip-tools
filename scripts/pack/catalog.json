@@ -1,0 +1,320 @@
+{
+  "schema_version": 1,
+  "description": "Vendor resource bundles, not Zephyr board support. Templates require resolved bootloader addresses and generated firmware/private resources.",
+  "profiles": {
+    "d12x/demo68-nor": {
+      "platform": "d12x",
+      "product": "demo68-nor",
+      "media": "spi-nor",
+      "zephyr_supported": false,
+      "files": {
+        "bootloader.bin": {
+          "path": "d12x/demo68-nor/bootloader.bin",
+          "source": "luban-lite/target/d12x/demo68-nor/pack/bootloader.bin",
+          "sha256": "97cb8000029264bd7e98cc601d0f7fff989229c4a6c260101238dcc8102db80d"
+        },
+        "image_cfg.json": {
+          "path": "d12x/demo68-nor/image_cfg.json",
+          "source": "luban-lite/target/d12x/demo68-nor/pack/image_cfg.json",
+          "sha256": "848fade9eee4667fbff0a958e0ddbb870eff6f0fff0c6f002f3ce375361338a7"
+        },
+        "env.txt": {
+          "path": "common/env.txt",
+          "source": "luban-lite/target/d12x/demo68-nor/pack/env.txt",
+          "sha256": "cc0c19b9212c14220190db638a7826889461e93d9f675b32af9e1124ebc88680"
+        },
+        "pbp_cfg.json": {
+          "path": "d12x/demo68-nor/pbp_cfg.json",
+          "source": "luban-lite/target/d12x/demo68-nor/pack/pbp_cfg.json",
+          "sha256": "0741ea5eff4e9cc675ade46ae25da29ed15899d09bca59754caa09c47129092a"
+        },
+        "ota-subimgs.cfg": {
+          "path": "d12x/demo68-nor/ota-subimgs.cfg",
+          "source": "luban-lite/target/d12x/demo68-nor/pack/ota-subimgs.cfg",
+          "sha256": "c5db39c1a147eb0cfdcb2c414d9b4edee1e221d9cca4cfcce2270d265e53aee9"
+        },
+        "d12x.pbp": {
+          "path": "d12x/common/d12x.pbp",
+          "source": "luban-lite/bsp/artinchip/sys/d12x/d12x.pbp",
+          "sha256": "20cd6e34d9bbedfd1563ad91aa1e185f67b7f4b5ae8999ec7565e597f793d460"
+        }
+      },
+      "missing_files": [],
+      "resource_status": "complete"
+    },
+    "d12x/demo68-nand": {
+      "platform": "d12x",
+      "product": "demo68-nand",
+      "media": "spi-nand",
+      "zephyr_supported": false,
+      "files": {
+        "bootloader.bin": {
+          "path": "d12x/demo68-nand/bootloader.bin",
+          "source": "luban-lite/target/d12x/demo68-nand/pack/bootloader.bin",
+          "sha256": "b7fd69272ff401904fe323e9bf9001ccda1a357c03ca021368404b4b64dea7ad"
+        },
+        "image_cfg.json": {
+          "path": "d12x/demo68-nand/image_cfg.json",
+          "source": "luban-lite/target/d12x/demo68-nand/pack/image_cfg.json",
+          "sha256": "4618c403b1fb8dccd95ebca2a839aa20b367c5d176ac24d1db7683dd30c11efa"
+        },
+        "env.txt": {
+          "path": "common/env.txt",
+          "source": "luban-lite/target/d12x/demo68-nand/pack/env.txt",
+          "sha256": "cc0c19b9212c14220190db638a7826889461e93d9f675b32af9e1124ebc88680"
+        },
+        "pbp_cfg.json": {
+          "path": "d12x/demo68-nand/pbp_cfg.json",
+          "source": "luban-lite/target/d12x/demo68-nand/pack/pbp_cfg.json",
+          "sha256": "6566733e127994e402948a447f0f815329ae1c1efbe73e67708411a6869d9951"
+        },
+        "ota-subimgs.cfg": {
+          "path": "d12x/demo68-nand/ota-subimgs.cfg",
+          "source": "luban-lite/target/d12x/demo68-nand/pack/ota-subimgs.cfg",
+          "sha256": "26539692de5550ba8006bd37dab55b5e4c7ad6f32a772f5a532b96643b2399a0"
+        },
+        "d12x.pbp": {
+          "path": "d12x/common/d12x.pbp",
+          "source": "luban-lite/bsp/artinchip/sys/d12x/d12x.pbp",
+          "sha256": "20cd6e34d9bbedfd1563ad91aa1e185f67b7f4b5ae8999ec7565e597f793d460"
+        }
+      },
+      "missing_files": [],
+      "resource_status": "complete"
+    },
+    "d12x/demo68-mmc": {
+      "platform": "d12x",
+      "product": "demo68-mmc",
+      "media": "mmc",
+      "zephyr_supported": false,
+      "files": {
+        "image_cfg.json": {
+          "path": "d12x/demo68-mmc/image_cfg.json",
+          "source": "luban-lite/target/d12x/demo68-mmc/pack/image_cfg.json",
+          "sha256": "f0b36b53b0fcda02bcfcbb0b8008a37d4678c8c49c94c704f2702c160934e7dc"
+        },
+        "env.txt": {
+          "path": "common/env-mmc.txt",
+          "source": "luban-lite/target/d12x/demo68-mmc/pack/env.txt",
+          "sha256": "de64f6e4a22f1c09845caa4e2a56fc322a216b37eb64391ecd194a45b91e4ead"
+        },
+        "pbp_cfg.json": {
+          "path": "d12x/demo68-mmc/pbp_cfg.json",
+          "source": "luban-lite/target/d12x/demo68-mmc/pack/pbp_cfg.json",
+          "sha256": "af2424bab9a192ac90efba44cb7be6fd12cdf82962c7931ff78c04bb6338c830"
+        },
+        "ota-subimgs.cfg": {
+          "path": "d12x/demo68-mmc/ota-subimgs.cfg",
+          "source": "luban-lite/target/d12x/demo68-mmc/pack/ota-subimgs.cfg",
+          "sha256": "bd1949061b31832c8387b029efd5684eb0fef2237499a5b931a973bfcff45731"
+        },
+        "d12x.pbp": {
+          "path": "d12x/common/d12x.pbp",
+          "source": "luban-lite/bsp/artinchip/sys/d12x/d12x.pbp",
+          "sha256": "20cd6e34d9bbedfd1563ad91aa1e185f67b7f4b5ae8999ec7565e597f793d460"
+        }
+      },
+      "missing_files": [
+        "bootloader.bin"
+      ],
+      "resource_status": "incomplete"
+    },
+    "d21x/demo88-nor": {
+      "platform": "d21x",
+      "product": "demo88_nor",
+      "media": "spi-nor",
+      "zephyr_supported": false,
+      "files": {
+        "bootloader.bin": {
+          "path": "d21x/demo88-nor/bootloader.bin",
+          "source": "luban-lite/target/d21x/demo88-nor/pack/bootloader.bin",
+          "sha256": "97e53dc93f53c17807f638507ff1574eaff85df3651621b6af928d0ae5f1dbd1"
+        },
+        "image_cfg.json": {
+          "path": "d21x/demo88-nor/image_cfg.json",
+          "source": "luban-lite/target/d21x/demo88-nor/pack/image_cfg.json",
+          "sha256": "079cbf95d80f51faf9fd5ad6b215cc9096d130d25e7b3de5b0d4c75468322a4f"
+        },
+        "env.txt": {
+          "path": "common/env.txt",
+          "source": "luban-lite/target/d21x/demo88-nor/pack/env.txt",
+          "sha256": "cc0c19b9212c14220190db638a7826889461e93d9f675b32af9e1124ebc88680"
+        },
+        "ddr_init.json": {
+          "path": "d21x/common/ddr_init.json",
+          "source": "luban-lite/target/d21x/demo88-nor/pack/ddr_init.json",
+          "sha256": "bdea94bcf922d51300e5e9ffa9b919382a416f9110a5194fa621ef9f21e811cb"
+        },
+        "ota-subimgs.cfg": {
+          "path": "d21x/demo88-nor/ota-subimgs.cfg",
+          "source": "luban-lite/target/d21x/demo88-nor/pack/ota-subimgs.cfg",
+          "sha256": "ec01357330b832a5c5d648559ab6d13a1226c72095c28cd937fe20fcdabeb4bf"
+        },
+        "d21x.pbp": {
+          "path": "d21x/common/d21x.pbp",
+          "source": "luban-lite/bsp/artinchip/sys/d21x/d21x.pbp",
+          "sha256": "1400a722a223afc8b0ff7fae4db41b4ee7046147a8625a1d97b3220770bbefff"
+        }
+      },
+      "missing_files": [],
+      "resource_status": "complete"
+    },
+    "d21x/demo88-nand": {
+      "platform": "d21x",
+      "product": "demo88_nand",
+      "media": "spi-nand",
+      "zephyr_supported": false,
+      "files": {
+        "bootloader.bin": {
+          "path": "d21x/demo88-nand/bootloader.bin",
+          "source": "luban-lite/target/d21x/demo88-nand/pack/bootloader.bin",
+          "sha256": "84128214f022e3dc66bd149823111358c0f405b822ba90163181bcd3d8c4cdde"
+        },
+        "image_cfg.json": {
+          "path": "d21x/demo88-nand/image_cfg.json",
+          "source": "luban-lite/target/d21x/demo88-nand/pack/image_cfg.json",
+          "sha256": "bc45eb5e358b623802e73017750b62e38ee5890af95761343fcbb9045e4c699d"
+        },
+        "env.txt": {
+          "path": "common/env.txt",
+          "source": "luban-lite/target/d21x/demo88-nand/pack/env.txt",
+          "sha256": "cc0c19b9212c14220190db638a7826889461e93d9f675b32af9e1124ebc88680"
+        },
+        "ddr_init.json": {
+          "path": "d21x/common/ddr_init.json",
+          "source": "luban-lite/target/d21x/demo88-nand/pack/ddr_init.json",
+          "sha256": "bdea94bcf922d51300e5e9ffa9b919382a416f9110a5194fa621ef9f21e811cb"
+        },
+        "ota-subimgs.cfg": {
+          "path": "d21x/demo88-nand/ota-subimgs.cfg",
+          "source": "luban-lite/target/d21x/demo88-nand/pack/ota-subimgs.cfg",
+          "sha256": "9856df945bf6d5255110470fa6ba9332824bfe0e6c7d943c3f19a8c60c579152"
+        },
+        "d21x.pbp": {
+          "path": "d21x/common/d21x.pbp",
+          "source": "luban-lite/bsp/artinchip/sys/d21x/d21x.pbp",
+          "sha256": "1400a722a223afc8b0ff7fae4db41b4ee7046147a8625a1d97b3220770bbefff"
+        }
+      },
+      "missing_files": [],
+      "resource_status": "complete"
+    },
+    "d21x/demo88-mmc": {
+      "platform": "d21x",
+      "product": "demo88_mmc",
+      "media": "mmc",
+      "zephyr_supported": false,
+      "files": {
+        "bootloader.bin": {
+          "path": "d21x/demo88-mmc/bootloader.bin",
+          "source": "luban-lite/target/d21x/demo88-mmc/pack/bootloader.bin",
+          "sha256": "2359f084f50077237bdf0edf53eb368c0def29d6456faca605a3842606e3d5ab"
+        },
+        "image_cfg.json": {
+          "path": "d21x/demo88-mmc/image_cfg.json",
+          "source": "luban-lite/target/d21x/demo88-mmc/pack/image_cfg.json",
+          "sha256": "1f5e18d9b1d0343c630961328f356354fae6a785193fb9b4803a991b7180f501"
+        },
+        "env.txt": {
+          "path": "common/env-mmc.txt",
+          "source": "luban-lite/target/d21x/demo88-mmc/pack/env.txt",
+          "sha256": "de64f6e4a22f1c09845caa4e2a56fc322a216b37eb64391ecd194a45b91e4ead"
+        },
+        "ddr_init.json": {
+          "path": "d21x/common/ddr_init.json",
+          "source": "luban-lite/target/d21x/demo88-mmc/pack/ddr_init.json",
+          "sha256": "bdea94bcf922d51300e5e9ffa9b919382a416f9110a5194fa621ef9f21e811cb"
+        },
+        "ota-subimgs.cfg": {
+          "path": "d21x/demo88-mmc/ota-subimgs.cfg",
+          "source": "luban-lite/target/d21x/demo88-mmc/pack/ota-subimgs.cfg",
+          "sha256": "2482c962d5430055f18b09e99a15186000036757f47e8f1fecc8c60de880a721"
+        },
+        "d21x.pbp": {
+          "path": "d21x/common/d21x.pbp",
+          "source": "luban-lite/bsp/artinchip/sys/d21x/d21x.pbp",
+          "sha256": "1400a722a223afc8b0ff7fae4db41b4ee7046147a8625a1d97b3220770bbefff"
+        }
+      },
+      "missing_files": [],
+      "resource_status": "complete"
+    },
+    "d12p/demo88-nor": {
+      "platform": "d12p",
+      "chip_family": "D125",
+      "product": "demo88-nor",
+      "media": "spi-nor",
+      "zephyr_boards": [
+        "ultrasemi_d12p_usbdisp_demo88_nor_5_5"
+      ],
+      "zephyr_supported": true,
+      "resource_status": "complete",
+      "missing_files": [],
+      "files": {
+        "env.txt": {
+          "path": "common/env.txt",
+          "source": "luban-lite/target/d12p/demo88-nor/pack/env.txt",
+          "sha256": "cc0c19b9212c14220190db638a7826889461e93d9f675b32af9e1124ebc88680"
+        },
+        "d12p.pbp": {
+          "path": "d12p/common/d12p.pbp",
+          "source": "luban-lite/bsp/artinchip/sys/d12p/d12p.pbp",
+          "sha256": "c22dd5b3b47c4d4e88023d3544a19fb6287cb94f414de4db7d603299c38f967f"
+        },
+        "pbp_cfg.json": {
+          "path": "d12p/demo88-nor/pbp_cfg.json",
+          "source": "Existing module-maintained D125 resource (preserved)",
+          "sha256": "9de65fe7c93829da96730e4cb0c5b71e540cda8246c8fb863592e2fdd0e7895b"
+        },
+        "bootloader.bin": {
+          "path": "d12p/demo88-nor/bootloader.bin",
+          "source": "Existing module-maintained D125 resource (preserved)",
+          "sha256": "1066953e7330e65c157c577c6227928c8fbbe9623af7f648caf0648125577ea3"
+        }
+      },
+      "boot_chain": "direct",
+      "bootloader_role": "RAM-resident USB updater only; persistent boot target is MCUboot"
+    },
+    "d12p/d126-demo124-nor": {
+      "platform": "d12p",
+      "chip_family": "D126",
+      "product": "d126-demo124-nor",
+      "media": "spi-nor",
+      "zephyr_boards": [
+        "artinchip_d126_demo124_nor"
+      ],
+      "zephyr_supported": false,
+      "resource_status": "incomplete",
+      "missing_files": [
+        "bootloader.bin"
+      ],
+      "files": {
+        "env.txt": {
+          "path": "common/env.txt",
+          "source": "luban-lite/target/d12p/d126-demo124-nor/pack/env.txt",
+          "sha256": "cc0c19b9212c14220190db638a7826889461e93d9f675b32af9e1124ebc88680"
+        },
+        "d12p.pbp": {
+          "path": "d12p/common/d12p.pbp",
+          "source": "luban-lite/bsp/artinchip/sys/d12p/d12p.pbp",
+          "sha256": "c22dd5b3b47c4d4e88023d3544a19fb6287cb94f414de4db7d603299c38f967f"
+        },
+        "pbp_cfg.json": {
+          "path": "d12p/d126-demo124-nor/pbp_cfg.json",
+          "source": "luban-lite/target/d12p/d126-demo124-nor/pack/pbp_cfg.json",
+          "sha256": "328448c599b7f10d4e9ac770884688e739075acf7f0ee9641b80bfc494baca30"
+        },
+        "image_cfg.json": {
+          "path": "d12p/d126-demo124-nor/image_cfg.json",
+          "source": "luban-lite/target/d12p/d126-demo124-nor/pack/image_cfg.json",
+          "sha256": "aa3041762e36df0e81e3e2ea461c254a38b386b61b20a4bef212ff1818f08fee"
+        },
+        "bootloader_defconfig": {
+          "path": "d12p/d126-demo124-nor/bootloader_defconfig",
+          "source": "luban-lite/target/configs/d12p_d126-demo124-nor_baremetal_bootloader_defconfig",
+          "sha256": "21b700edf6886ec0d24273fd7cdac8568c8e94671ec18387193da6c5676131de"
+        }
+      }
+    }
+  }
+}
