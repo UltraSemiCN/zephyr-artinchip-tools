@@ -75,12 +75,10 @@ def validate_boot_key(elf_path, key_path):
 
 
 def build_sysbuild_image(build_dir: Path, board=None, zephyr_base=None):
-    cache = (build_dir / 'CMakeCache.txt').read_text()
-    chain_match = re.search(r'^ARTINCHIP_MCUBOOT_BOOT_CHAIN:[^=]+=(.+)$', cache, re.MULTILINE)
-    chain = chain_match[1].strip() if chain_match else None
-    if chain != 'direct':
-        raise ValueError('unsupported boot configuration; rebuild using the board sysbuild settings')
-    domains = yaml.safe_load((build_dir / 'domains.yaml').read_text())
+    domains_path = build_dir / 'domains.yaml'
+    if not domains_path.is_file():
+        raise ValueError('sysbuild root must contain domains.yaml')
+    domains = yaml.safe_load(domains_path.read_text())
     builds = {d['name']: Path(d['build_dir']) for d in domains['domains']}
     if 'mcuboot' not in builds or domains['default'] == 'mcuboot':
         raise ValueError('sysbuild must contain MCUboot and a default application')
@@ -117,7 +115,7 @@ def build_sysbuild_image(build_dir: Path, board=None, zephyr_base=None):
     boot_z, app_z = boot_dir / 'zephyr', app_dir / 'zephyr'
     boot_addresses = read_firmware_addresses(boot_z / 'zephyr.elf', boot_z / 'zephyr.bin')
     app_addresses = read_firmware_addresses(app_z / 'zephyr.elf', app_z / 'zephyr.bin')
-    if boot_addresses != (0x40000100, 0x40000100):
+    if boot_addresses != (profile.mcuboot_entry, profile.mcuboot_entry):
         raise ValueError('MCUboot requires the ROM-header-reserved overlay; rebuild pristine')
     if boot_edt.chosen_node('zephyr,code-partition') != boot_edt.label2node['spl_partition']:
         raise ValueError('MCUboot must occupy the ROM boot partition')
@@ -140,6 +138,8 @@ def build_sysbuild_image(build_dir: Path, board=None, zephyr_base=None):
     for filename, partition in (("data.lfs", "data"), ("rodata.fatfs", "rodata")):
         if (app_z / filename).is_file() and partition not in layout['partitions']:
             raise ValueError(f'{filename} exists but partition {partition} is missing')
+    if profile.media == 'spi-nand' and signed.stat().st_size > slot.regs[0].size - 2 * 131072:
+        raise ValueError('NAND image must leave at least two erase blocks for bad-block reserve')
     check_prerequisites(profile)
     output = build_dir / 'airburn'
     reset_output_dir(output)
@@ -150,7 +150,8 @@ def build_sysbuild_image(build_dir: Path, board=None, zephyr_base=None):
     cfg['image']['target']['application'] = {
         'file': 'zephyr.signed.bin', 'attr': ['mtd', 'required'], 'part': [slot_label]}
     # Factory flashing must not leave an old, higher-version slot1 behind.
-    (output / 'slot1.empty.bin').write_bytes(b'\xff' * secondary.regs[0].size)
+    empty_size = 2048 if profile.media == 'spi-nand' else secondary.regs[0].size
+    (output / 'slot1.empty.bin').write_bytes(b'\xff' * empty_size)
     cfg['image']['target']['secondary'] = {
         'file': 'slot1.empty.bin', 'attr': ['mtd', 'required'], 'part': [secondary_label]}
     cfg_path.write_text(json.dumps(cfg, indent=4) + '\n')
@@ -165,9 +166,8 @@ def build_sysbuild_image(build_dir: Path, board=None, zephyr_base=None):
         image.unlink(missing_ok=True)
         raise
     report = {
-        'board': board, 'mode': 'ram-load', 'version': version,
+        'board': board, 'mode': 'ram-load', 'version': version, 'media': profile.media,
         'boot_chain': 'ROM -> PBP -> MCUboot -> Zephyr',
-        'boot_chain_mode': chain,
         'application_sign_version': app_cfg['CONFIG_MCUBOOT_IMGTOOL_SIGN_VERSION'].strip('"'),
         'boot_load': hex(boot_addresses[0]), 'boot_entry': hex(boot_addresses[1]),
         'app_load': hex(app_addresses[0]), 'app_entry': hex(app_addresses[1]),

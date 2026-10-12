@@ -20,12 +20,23 @@ def read_flash_layout(edt):
         if len(candidates) != 1:
             raise ValueError("define one SPI NOR partition table or the airburn-flash alias")
         flash = candidates[0]
-    if "jedec,spi-nor" not in flash.compats:
+    if "artinchip,airburn-nand-map" in flash.compats:
+        raw = flash.props["flash"].val
+        if "xtx,xt26g01c" not in raw.compats or raw.props["jedec-id"].val != bytes([11, 17]):
+            raise ValueError("D213 NAND packaging requires XT26G01C ID 0b 11")
+        capacity = flash.props["size-bytes"].val
+        alignment = flash.props["erase-block-size"].val
+        if (capacity != raw.props["size-bytes"].val or alignment != 131072 or
+                raw.props["write-block-size"].val != 2048):
+            raise ValueError("NAND mapping geometry differs from XT26G01C")
+    elif "jedec,spi-nor" not in flash.compats:
         raise ValueError("airburn-flash must reference a jedec,spi-nor device")
-    bits = flash.props.get("size")
-    if bits is None or bits.val <= 0 or bits.val % 8:
-        raise ValueError("SPI NOR size must specify a positive capacity in bits")
-    capacity = bits.val // 8
+    else:
+        bits = flash.props.get("size")
+        if bits is None or bits.val <= 0 or bits.val % 8:
+            raise ValueError("SPI NOR size must specify a positive capacity in bits")
+        capacity = bits.val // 8
+        alignment = 2048
     tables = [n for n in flash.children.values() if "fixed-partitions" in n.compats]
     if len(tables) != 1:
         raise ValueError("AirBurn flash must have one fixed-partitions node")
@@ -42,8 +53,8 @@ def read_flash_layout(edt):
             raise ValueError(f"invalid or duplicate partition label: {name}")
         if offset < end or size <= 0 or offset + size > capacity:
             raise ValueError(f"partition {name} overlaps or exceeds flash capacity")
-        if offset % 2048 or size % 2048:
-            raise ValueError(f"partition {name} must be aligned to AirBurn's 2048-byte blocks")
+        if offset % alignment or size % alignment:
+            raise ValueError(f"partition {name} must be aligned to {alignment}-byte blocks")
         partitions[name] = {"offset": hex(offset), "size": hex(size)}
         end = offset + size
     missing = {"spl", "env", "env_r"} - partitions.keys()

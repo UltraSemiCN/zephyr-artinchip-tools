@@ -3,11 +3,8 @@
 
 function(artinchip-tools_post_cmake)
   if(NOT SB_CONFIG_BOOTLOADER_MCUBOOT OR
-     NOT BOARD MATCHES "^ultrasemi_d12p_usbdisp_demo88_nor_5_5(/|$)")
+     NOT BOARD MATCHES "^(ultrasemi_d12p_usbdisp_demo88_nor_5_5|artinchip_d12p_demo88_nor|artinchip_d13x_demo88_nor|artinchip_d21x_demo128_nand)(/|$)")
     return()
-  endif()
-  if(NOT ARTINCHIP_MCUBOOT_BOOT_CHAIN STREQUAL "direct")
-    message(FATAL_ERROR "Unsupported boot configuration; rebuild using the board sysbuild settings")
   endif()
   set(pack_script "${ZEPHYR_ARTINCHIP_TOOLS_MODULE_DIR}/scripts/mk_image_zephyr.py")
   add_custom_target(artinchip-airburn ALL

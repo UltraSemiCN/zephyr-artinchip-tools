@@ -1,0 +1,59 @@
+{
+  "source_repository": "luban-lite",
+  "source_commit": "c06865a38ca8bcffa337eee7b209651abacf45d6",
+  "files": {
+    "bootloader.bin": {
+      "source": "output/d21x_demo128-nand_baremetal_bootloader/images/d21x.bin",
+      "sha256": "ef8b967221b114d5686d82f5fc0fe9b82141c706577b00e000b12e60f146f83f",
+      "origin": "rebuilt from source with CONFIG_SPI_NAND_XTX=y"
+    },
+    "ddr_init.json": {
+      "source": "target/d21x/demo128-nand/pack/ddr_init.json",
+      "sha256": "bdea94bcf922d51300e5e9ffa9b919382a416f9110a5194fa621ef9f21e811cb"
+    },
+    "updater_defconfig": {
+      "source": "target/configs/d21x_demo128-nand_baremetal_bootloader_defconfig plus CONFIG_SPI_NAND_XTX=y",
+      "sha256": "6bcc67d2d67f042801f944127604fdf11e0fb7f0b19fc8482fa2ee568655ada7"
+    }
+  },
+  "status": "MCUboot NAND Shell test profile; hardware validation pending",
+  "usb_updater": {
+    "dram_base": "0x40000000",
+    "dram_size": "0x08000000",
+    "heap_size": "0x00400000",
+    "text_size": "0x0007ff00",
+    "load_address": "0x47b80000",
+    "entry_point": "0x47b80100",
+    "usb_receive_address": "0x41000000",
+    "formula_source": "kernel/rt-thread/tools/menuconfig.py:get_text_base",
+    "configuration_sources": [
+      "bsp/artinchip/sys/d21x/Kconfig.chip",
+      "target/d21x/common/Kconfig.board",
+      "target/configs/d21x_demo128-nand_baremetal_bootloader_defconfig"
+    ],
+    "binary_cross_check": {
+      "pointer_file_offset": "0x416e0",
+      "pointer_value": "0x47bcb4c8",
+      "string_file_offset": "0x4b3c8",
+      "string": "Full disk upgrade"
+    },
+    "xt26g01c": {
+      "table_file_offset": "0x517d0",
+      "manufacturer_file_offset": "0x517b8",
+      "ecc_function_address": "0x47bb5a50",
+      "jedec_id": "0b11",
+      "page_size": 2048,
+      "oob_size": 128,
+      "pages_per_block": 64,
+      "blocks": 1024
+    }
+  },
+  "build": {
+    "toolchain": "Xuantie V2.6.1",
+    "configuration": "updater_defconfig",
+    "source_changes": [
+      "CONFIG_SPI_NAND_XTX=y"
+    ],
+    "elf_entry": "0x47b80100"
+  }
+}

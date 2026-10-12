@@ -81,7 +81,7 @@ class PartitionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             cfg = {"spi-nor": {"partitions": {"os": {"size": "0x800"}}},
-                   "image": {"target": {"os": {"file": "mcuboot.aic", "part": ["os"],
+                   "image": {"info": {"media": {"type": "spi-nor"}}, "target": {"os": {"file": "mcuboot.aic", "part": ["os"],
                                                 "attr": ["required"]}}}}
             config = root / "image_cfg.json"
             config.write_text(json.dumps(cfg))

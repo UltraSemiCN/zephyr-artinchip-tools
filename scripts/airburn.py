@@ -11,11 +11,12 @@ Vendor bootloader.bin is used only by the RAM-resident USB updater.
 from __future__ import annotations
 
 import json
+import hashlib
 import shutil
 import struct
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 
@@ -54,11 +55,16 @@ class AirBurnProfile:
     bootloader_run_in_dram: str | None = None
     pbp_file: Path | None = None
     version: str = "1.0.0"
+    mcuboot_entry: int = 0x40000100
+    extended_loader: bool = False
+    media: str = "spi-nor"
+    private_file: str = "pbp_cfg.json"
 
     @property
     def image_name(self) -> str:
         """Intermediate filename imposed by the vendor packer."""
-        return f"{self.platform}_{self.product}_v{self.version}.img"
+        suffix = "_page_2k_block_128k" if self.media == "spi-nand" else ""
+        return f"{self.platform}_{self.product}{suffix}_v{self.version}.img"
 
     @property
     def pack_files(self) -> dict[str, Path]:
@@ -66,7 +72,7 @@ class AirBurnProfile:
         return {
             "bootloader.bin": self.pack_dir / "bootloader.bin",
             "env.txt": self.env_file,
-            "pbp_cfg.json": self.pack_dir / "pbp_cfg.json",
+            "pbp_cfg.json": self.pack_dir / self.private_file,
             self.pbp_name: self.pbp_file or self.pack_dir / self.pbp_name,
         }
 
@@ -94,10 +100,44 @@ PROFILE = AirBurnProfile(
 )
 
 
+D213_PROFILE = AirBurnProfile(
+    board="artinchip_d21x_demo128_nand", platform="d21x", product="demo128_nand",
+    description="MCUboot for ArtInChip D213EC-V4 XT26G01CW NAND",
+    pack_dir=PACK_DIR / "d21x" / "demo128-nand",
+    env_file=PACK_DIR / "common" / "env.txt", pbp_name="d21x.pbp",
+    pbp_file=PACK_DIR / "d21x" / "common" / "d21x.pbp",
+    psram_ram="0x00103000", spl_ram="0x41000000",
+    resource_private_key="private", resource_pbp_key="pbp",
+    # Vendor updater links below its 4 MiB heap at the top of 128 MiB DDR.
+    # spl_ram is the USB receive buffer, not this binary's linked address.
+    bootloader_load_address="0x47b80000", bootloader_entry_point="0x47b80100",
+    mcuboot_entry=0x41000100, extended_loader=True, media="spi-nand",
+    private_file="ddr_init.json")
+
+PROFILES = {
+    D213_PROFILE.board: D213_PROFILE,
+    PROFILE.board: PROFILE,
+    "artinchip_d12p_demo88_nor": replace(
+        PROFILE, board="artinchip_d12p_demo88_nor",
+        description="MCUboot for ArtInChip D125 Demo88 NOR"),
+    "artinchip_d13x_demo88_nor": AirBurnProfile(
+        board="artinchip_d13x_demo88_nor", platform="d13x", product="demo88-nor",
+        description="MCUboot for ArtInChip D133 Demo88 NOR",
+        pack_dir=PACK_DIR / "d13x" / "demo88-nor",
+        env_file=PACK_DIR / "common" / "env.txt", pbp_name="d13x.pbp",
+        psram_ram="0x30044000", spl_ram="0x40100000",
+        resource_private_key="private", resource_pbp_key="pbp",
+        bootloader_load_address="0x406c0000", bootloader_entry_point="0x406c0100",
+        bootloader_run_in_dram="true", mcuboot_entry=0x40000100,
+        extended_loader=True),
+}
+
+
 def select_profile(board: str) -> AirBurnProfile:
-    if board != PROFILE.board:
-        raise ValueError(f"unsupported board '{board}'; supported: {PROFILE.board}")
-    return PROFILE
+    try:
+        return PROFILES[board]
+    except KeyError as error:
+        raise ValueError(f"unsupported board '{board}'; supported: {', '.join(PROFILES)}") from error
 
 
 def run(command: list[str | Path]) -> None:
@@ -117,18 +157,19 @@ def copy_required(source: Path, destination: Path) -> None:
 def write_config(path: Path, profile: AirBurnProfile, flash_layout: dict,
                  addresses: tuple[int, int]) -> None:
     pbp_cfg_bin = "pbp_cfg.bin"
+    init_file = "usbupg-ddr-init.aic" if profile.media == "spi-nand" else "usbupg-psram-init.aic"
     config = {
-        "spi-nor": flash_layout,
+        profile.media: flash_layout,
         "image": {
             "info": {
                 "platform": profile.platform,
                 "product": profile.product,
                 "version": profile.version,
-                "media": {"type": "spi-nor", "device_id": 0},
+                "media": {"type": profile.media, "device_id": 0},
             },
             "updater": {
                 "psram": {
-                    "file": "usbupg-psram-init.aic",
+                    "file": init_file,
                     "attr": ["required", "run"],
                     "ram": profile.psram_ram,
                 },
@@ -167,6 +208,11 @@ def write_config(path: Path, profile: AirBurnProfile, flash_layout: dict,
             },
         },
     }
+    if profile.media == "spi-nand":
+        config["image"]["info"]["media"]["array_organization"] = [
+            {"page": "2k", "block": "128k", "oob": "128"}]
+        updater = config["image"]["updater"]
+        config["image"]["updater"] = {"ddr": updater["psram"], "spl": updater["spl"]}
     if "rodata" in flash_layout["partitions"]:
         config["image"]["target"]["rodata"] = {
             "file": "rodata.fatfs",
@@ -184,7 +230,7 @@ def write_config(path: Path, profile: AirBurnProfile, flash_layout: dict,
         profile.resource_private_key: pbp_cfg_bin,
         profile.resource_pbp_key: profile.pbp_name,
     }
-    config["pre-process"]["aicimage"]["usbupg-psram-init.aic"] = {
+    config["pre-process"]["aicimage"][init_file] = {
         "head_ver": "0x00010001",
         "resource": resource,
     }
@@ -210,6 +256,19 @@ def write_config(path: Path, profile: AirBurnProfile, flash_layout: dict,
         "resource": resource,
     }
 
+    if profile.extended_loader:
+        # D13x vendor format: execute the PBP prefix before loading the CPU image.
+        images = config["pre-process"]["aicimage"]
+        concatenate = {}
+        for name in ("bootloader", "mcuboot"):
+            loader = images.pop(f"{name}.aic")
+            loader["resource"] = {profile.resource_private_key: pbp_cfg_bin}
+            images[f"{name}-loader.aic"] = loader
+            images[f"{name}-pbp.aic"] = {
+                "head_ver": "0x00010001", "resource": resource, "with_ext": "true"}
+            concatenate[f"{name}.aic"] = [f"{name}-pbp.aic", f"{name}-loader.aic"]
+        config["pre-process"]["concatenate"] = concatenate
+
     path.write_text(json.dumps(config, indent=4) + "\n", encoding="ascii")
 
 
@@ -227,7 +286,8 @@ def verify_image(path: Path, profile: AirBurnProfile) -> None:
         raise ValueError(f"invalid AirBurn image magic: {magic!r}")
     if platform != profile.platform.encode():
         raise ValueError(f"unexpected platform: {platform!r}")
-    if product != profile.product.encode():
+    expected_product = profile.product + ("_page_2k_block_128k" if profile.media == "spi-nand" else "")
+    if product != expected_product.encode():
         raise ValueError(f"unexpected product: {product!r}")
     if version != profile.version.encode():
         raise ValueError(f"unexpected version: {version!r}")
@@ -244,9 +304,40 @@ def verify_image(path: Path, profile: AirBurnProfile) -> None:
 
 
 def check_prerequisites(profile: AirBurnProfile) -> None:
+    if profile.media == "spi-nand":
+        verify_updater_provenance(profile)
     for path in REQUIRED_TOOLS + profile.required_pack:
         if not path.is_file():
             raise FileNotFoundError(f"required file not found: {path}")
+
+
+def verify_updater_provenance(profile: AirBurnProfile) -> None:
+    """Check the fixed vendor updater against its recorded link layout."""
+    manifest = json.loads((profile.pack_dir / "provenance.json").read_text())
+    updater = manifest["usb_updater"]
+    expected_entry = (int(updater["dram_base"], 0) + int(updater["dram_size"], 0)
+                      - int(updater["heap_size"], 0) - int(updater["text_size"], 0))
+    if (int(profile.bootloader_entry_point, 0) != expected_entry or
+            int(profile.bootloader_load_address, 0) != expected_entry - 256):
+        raise ValueError("vendor updater load/entry differs from its recorded link layout")
+    for name, item in manifest["files"].items():
+        actual = hashlib.sha256((profile.pack_dir / name).read_bytes()).hexdigest()
+        if actual != item["sha256"]:
+            raise ValueError(f"vendor resource {name} differs from its recorded SHA256")
+
+
+    binary = (profile.pack_dir / "bootloader.bin").read_bytes()
+    chip = updater["xt26g01c"]
+    table = int(chip["table_file_offset"], 0)
+    maker = int(chip["manufacturer_file_offset"], 0)
+    id_pointer, = struct.unpack_from("<Q", binary, table)
+    geometry = struct.unpack_from("<4H", binary, table + 16)
+    ecc_pointer, = struct.unpack_from("<Q", binary, table + 48)
+    if (binary[maker] != 0x0b or binary[table + 8] != 1 or
+            binary[id_pointer - expected_entry] != 0x11 or
+            geometry != (2048, 128, 1024, 64) or
+            ecc_pointer != int(chip["ecc_function_address"], 0)):
+        raise ValueError("vendor updater is missing the validated XT26G01C table")
 
 
 def reset_output_dir(output_dir: Path) -> None:
@@ -279,7 +370,7 @@ def prepare_metadata(output_dir: Path, profile: AirBurnProfile, flash_layout: di
 
 def verify_partition_images(config_path: Path, output_dir: Path) -> None:
     config = json.loads(config_path.read_text())
-    partitions = config["spi-nor"]["partitions"]
+    partitions = config[config["image"]["info"]["media"]["type"]]["partitions"]
     for target in config["image"]["target"].values():
         source = output_dir / target["file"]
         if not source.is_file():
@@ -309,15 +400,20 @@ def prepare_private_resource(config_path: Path, output_dir: Path) -> None:
         "-o",
         pbp_cfg_bin,
     )
-    run_python(
-        MK_PREBOOTPROG,
-        "-m",
-        "PDAT",
-        "-i",
-        pbp_cfg_bin,
-        "-o",
-        pbp_cfg_bin,
-    )
+    # Match the vendor build: only private2 resources carry a PDAT header.
+    # Legacy private resources (D13x) start directly with configuration sections.
+    images = json.loads(config_path.read_text())["pre-process"]["aicimage"]
+    if any(image.get("resource", {}).get("private2") == pbp_cfg_bin.name
+           for image in images.values()):
+        run_python(
+            MK_PREBOOTPROG,
+            "-m",
+            "PDAT",
+            "-i",
+            pbp_cfg_bin,
+            "-o",
+            pbp_cfg_bin,
+        )
 
 def run_mk_image(config_path: Path, output_dir: Path) -> None:
     """Invoke ArtInChip mk_image.py to pre-process components and build the image."""

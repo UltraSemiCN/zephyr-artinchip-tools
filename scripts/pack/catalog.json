@@ -315,6 +315,34 @@
           "sha256": "21b700edf6886ec0d24273fd7cdac8568c8e94671ec18387193da6c5676131de"
         }
       }
+    },
+    "d13x/demo88-nor": {
+      "platform": "d13x",
+      "product": "demo88-nor",
+      "media": "spi-nor",
+      "zephyr_supported": true,
+      "hardware_verified": false,
+      "files": {
+        "bootloader.bin": {
+          "path": "d13x/demo88-nor/bootloader.bin",
+          "source": "luban-lite/target/d13x/demo88-nor/pack/bootloader.bin",
+          "source_commit": "c06865a38ca8bcffa337eee7b209651abacf45d6",
+          "sha256": "783ba73348f5fd88cb7adba206a4c6dfdaab06652964ff2b42ee92ee43116dd6"
+        },
+        "pbp_cfg.json": {
+          "path": "d13x/demo88-nor/pbp_cfg.json",
+          "source": "luban-lite/target/d13x/demo88-nor/pack/pbp_cfg.json",
+          "source_commit": "c06865a38ca8bcffa337eee7b209651abacf45d6",
+          "sha256": "468171dd3ce35584463f70dedd9aae057b3e8e3d80d42a904c26dce05abaddea"
+        },
+        "d13x.pbp": {
+          "path": "d13x/demo88-nor/d13x.pbp",
+          "source": "luban-lite/bsp/artinchip/sys/d13x/d13x.pbp",
+          "source_commit": "c06865a38ca8bcffa337eee7b209651abacf45d6",
+          "sha256": "f2bbf14f12f533bcaa818f3654fab6ece65383a88dbd7744cf31f47e9e154f96"
+        }
+      },
+      "missing_files": []
     }
   }
 }
